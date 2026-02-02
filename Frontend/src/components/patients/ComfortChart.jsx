@@ -8,14 +8,26 @@ import {
   Legend,
 } from "recharts";
 
-const data = [
-  { category: "Very uncomfortable", male: 1, female: 1 },
-  { category: "Uncomfortable", male: 0, female: 1 },
-  { category: "Neutral", male: 0, female: 1 },
-  { category: "Very comfortable", male: 1, female: 2 },
+const STATUS_BUCKETS = [
+  "Uncomfortable",
+  "Comfortable"
 ];
 
-const ComfortChart = () => {
+const ComfortChart = ({ patients }) => {
+  const data = STATUS_BUCKETS.map((category) => {
+    const male = patients.filter(
+      (patient) =>
+        patient.gender === "Male" &&
+        patient.status?.toLowerCase() === category.toLowerCase()
+    ).length;
+    const female = patients.filter(
+      (patient) =>
+        patient.gender === "Female" &&
+        patient.status?.toLowerCase() === category.toLowerCase()
+    ).length;
+    return { category, male, female };
+  });
+
   return (
     <div className="medical-card mb-6">
       <h3 className="font-semibold text-foreground mb-4">

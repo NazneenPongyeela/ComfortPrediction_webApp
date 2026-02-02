@@ -42,7 +42,9 @@ const PredictionPage = () => {
 
   const handlePredict = async () => {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const token = localStorage.getItem("idToken");
+      const token =
+        localStorage.getItem("idToken") ||
+        sessionStorage.getItem("idToken");
 
       const payload = {
         hospital_number: formData.hn,

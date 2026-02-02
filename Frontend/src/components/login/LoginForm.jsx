@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
+import { signInUser } from "@/lib/firebase";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -12,12 +13,30 @@ const LoginForm = () => {
   const [password, setPassword] = useState("password123");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
 //   const token = await user.getIdToken();
 //     localStorage.setItem("idToken", token);
-   const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/patients");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const credential = await signInUser(email, password);
+      const token = await credential.user.getIdToken();
+      localStorage.setItem("idToken", token);
+      navigate("/patients");
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to sign in. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -33,6 +52,9 @@ const LoginForm = () => {
           <p className="text-muted-foreground text-sm mt-1">
             Sign in to access the information
           </p>
+          {errorMessage ? (
+            <p className="text-sm text-destructive mt-2">{errorMessage}</p>
+          ) : null}
         </div>
 
         {/* Form */}
@@ -105,9 +127,10 @@ const LoginForm = () => {
 
           <Button
             type="submit"
+            disabled={isSubmitting}
             className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-base rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30"
           >
-            Sign in
+            {isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
 
           <div className="relative my-6">

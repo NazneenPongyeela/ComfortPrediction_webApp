@@ -9,10 +9,15 @@ const firebaseConfig = {
 
 let cachedAuth = null;
 let cachedSignOut = null;
+let cachedSignIn = null;
 
 const loadFirebaseAuth = async () => {
-  if (cachedAuth && cachedSignOut) {
-    return { auth: cachedAuth, signOut: cachedSignOut };
+  if (cachedAuth && cachedSignOut && cachedSignIn) {
+    return {
+      auth: cachedAuth,
+      signOut: cachedSignOut,
+      signInWithEmailAndPassword: cachedSignIn,
+    };
   }
 
   const firebaseAppPath = "firebase/" + "app";
@@ -28,8 +33,13 @@ const loadFirebaseAuth = async () => {
   const app = appModule.initializeApp(firebaseConfig);
   cachedAuth = authModule.getAuth(app);
   cachedSignOut = authModule.signOut;
+  cachedSignIn = authModule.signInWithEmailAndPassword;
 
-  return { auth: cachedAuth, signOut: cachedSignOut };
+  return {
+    auth: cachedAuth,
+    signOut: cachedSignOut,
+    signInWithEmailAndPassword: cachedSignIn,
+  };
 };
 
 export const signOutUser = async () => {
@@ -40,6 +50,16 @@ export const signOutUser = async () => {
   }
 
   await firebase.signOut(firebase.auth);
+};
+
+export const signInUser = async (email, password) => {
+  const firebase = await loadFirebaseAuth();
+
+  if (!firebase?.signInWithEmailAndPassword) {
+    throw new Error("Firebase authentication is unavailable.");
+  }
+
+  return firebase.signInWithEmailAndPassword(firebase.auth, email, password);
 };
 
 export const auth = {

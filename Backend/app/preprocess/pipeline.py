@@ -9,6 +9,9 @@ def preprocess_features(raw: dict) -> dict:
     return {
         "skintemp": raw["skintemp"],
         "bmi": raw["bmi"],
+        "wind_speed": raw["windSpeed"],
+        "temperature": raw["temperature"],
+        "humidity": raw["humidity"],
         "is_allergy": raw["is_allergy"],
         **eda_features,
         **hrv_features

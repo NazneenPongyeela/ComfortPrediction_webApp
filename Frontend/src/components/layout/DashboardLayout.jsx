@@ -9,7 +9,8 @@ const DashboardLayout = ({ children }) => {
   const handleLogout = async () => {
     await signOutUser();
     localStorage.removeItem("idToken");
-    navigate("/login");
+    sessionStorage.removeItem("idToken");
+    navigate("/");
   };
 
   return (

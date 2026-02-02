@@ -11,7 +11,10 @@ FEATURE_ORDER = [
     "eda_phasic",
     "lf",
     "hf",
-    "lfhf_ratio"
+    "lfhf_ratio",
+    "wind_speed",
+    "temperature",
+    "humidity"
 ]
 
 def predict(features: dict) -> int:

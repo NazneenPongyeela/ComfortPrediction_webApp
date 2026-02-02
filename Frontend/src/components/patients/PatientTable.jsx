@@ -30,16 +30,27 @@ const getStatusClass = (status) => {
   }
 };
 
-const PatientTable = ({ patients }) => {
+const PatientTable = ({
+  patients,
+  onAddPatient,
+  onEditPatient,
+  onDeletePatient,
+}) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState("add");
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
-  const filteredPatients = patients.filter(
-    (patient) =>
-      patient.hn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPatients = patients.filter((patient) => {
+    const hn = patient.hn ?? "";
+    const name = patient.name ?? "";
+    return (
+      hn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
 
   return (
     <div className="medical-card">
@@ -54,7 +65,11 @@ const PatientTable = ({ patients }) => {
         </div>
 
         <Button
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => {
+            setDialogMode("add");
+            setSelectedPatient(null);
+            setIsDialogOpen(true);
+          }}
           className="bg-primary hover:bg-primary/90"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -112,8 +127,12 @@ const PatientTable = ({ patients }) => {
                     {patient.gender}
                   </span>
                 </TableCell>
-                <TableCell>{patient.height}</TableCell>
-                <TableCell>{patient.weight}</TableCell>
+                <TableCell>
+                  {patient.heightCm ? `${patient.heightCm} cm` : "-"}
+                </TableCell>
+                <TableCell>
+                  {patient.weightKg ? `${patient.weightKg} kg` : "-"}
+                </TableCell>
                 <TableCell>{patient.room}</TableCell>
                 <TableCell>
                   <span
@@ -141,6 +160,11 @@ const PatientTable = ({ patients }) => {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        setDialogMode("edit");
+                        setSelectedPatient(patient);
+                        setIsDialogOpen(true);
+                      }}
                     >
                       <Pencil className="w-4 h-4" />
                     </Button>
@@ -149,6 +173,7 @@ const PatientTable = ({ patients }) => {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => onDeletePatient?.(patient.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -163,6 +188,15 @@ const PatientTable = ({ patients }) => {
       <AddPatientDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
+        mode={dialogMode}
+        initialData={selectedPatient}
+        onSubmit={async (payload) => {
+          if (dialogMode === "edit" && selectedPatient) {
+            await onEditPatient?.(selectedPatient.id, payload);
+          } else {
+            await onAddPatient?.(payload);
+          }
+        }}
       />
     </div>
   );

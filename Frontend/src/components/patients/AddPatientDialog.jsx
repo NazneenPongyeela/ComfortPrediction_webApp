@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,21 +16,106 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const AddPatientDialog = ({ open, onOpenChange }) => {
-  const [formData, setFormData] = useState({
-    hn: "HN001",
-    room: "A301",
-    name: "นาย ทดสอบระบบ",
-    age: "20",
-    height: "158",
-    weight: "51.25",
-    gender: "",
-  });
+const emptyFormData = {
+  hn: "",
+  room: "",
+  name: "",
+  age: "",
+  height: "",
+  weight: "",
+  gender: "",
+};
 
-  const handleSubmit = (e) => {
+const AddPatientDialog = ({
+  open,
+  onOpenChange,
+  onSubmit,
+  initialData,
+  mode = "add",
+}) => {
+  const [formData, setFormData] = useState(emptyFormData);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        hn: initialData?.hn ?? "",
+        room: initialData?.room ?? "",
+        name: initialData?.name ?? "",
+        age: initialData?.age ?? "",
+        height: initialData?.heightCm ?? "",
+        weight: initialData?.weightKg ?? "",
+        gender: initialData?.genderValue ?? "",
+      });
+        setErrorMessage("");
+    }
+  }, [open, initialData]);
+
+  const validateForm = () => {
+    const hn = formData.hn.trim();
+    const room = formData.room.trim();
+    const name = formData.name.trim();
+    const age = Number(formData.age);
+    const height = Number(formData.height);
+    const weight = Number(formData.weight);
+    const gender = formData.gender?.trim();
+
+    if (!hn || !room || !name || !gender) {
+      return "Please fill in all required fields.";
+    }
+
+    if (Number.isNaN(age) || age < 0 || age > 120) {
+      return "Please enter a valid age.";
+    }
+
+    if (Number.isNaN(height) || height <= 0) {
+      return "Please enter a valid height.";
+    }
+
+    if (Number.isNaN(weight) || weight <= 0) {
+      return "Please enter a valid weight.";
+    }
+
+    return "";
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: submit to backend / firebase later
-    onOpenChange(false);
+    if (!onSubmit) {
+      onOpenChange(false);
+      return;
+    }
+
+    const validationError = validateForm();
+    if (validationError) {
+      setErrorMessage(validationError);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      await onSubmit({
+        hospital_number: formData.hn.trim(),
+        room: formData.room.trim(),
+        full_name: formData.name.trim(),
+        age: Number(formData.age),
+        height_cm: Number(formData.height),
+        weight_kg: Number(formData.weight),
+        gender: formData.gender.trim().toLowerCase(),
+      });
+      onOpenChange(false);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to save patient. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -38,11 +123,14 @@ const AddPatientDialog = ({ open, onOpenChange }) => {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            Add New Patient
+            {mode === "edit" ? "Edit Patient" : "Add New Patient"}
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
             Enter the patient's information below. All fields are required.
           </p>
+          {errorMessage ? (
+            <p className="text-sm text-destructive">{errorMessage}</p>
+          ) : null}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -151,9 +239,16 @@ const AddPatientDialog = ({ open, onOpenChange }) => {
               onClick={() => onOpenChange(false)}
             >
               Cancel
-            </Button>
-            <Button type="submit" className="bg-primary hover:bg-primary/90">
-              Add Patient
+            </Button><Button
+              type="submit"
+              className="bg-primary hover:bg-primary/90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? "Saving..."
+                : mode === "edit"
+                  ? "Save Changes"
+                  : "Add Patient"}
             </Button>
           </div>
         </form>
