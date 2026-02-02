@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 180 25% 97%;
+    --foreground: 200 25% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 25% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 25% 15%;
+
+    --primary: 174 72% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 174 60% 95%;
+    --secondary-foreground: 174 72% 30%;
+
+    --muted: 180 15% 95%;
+    --muted-foreground: 200 15% 45%;
+
+    --accent: 330 85% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 145 63% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 180 20% 88%;
+    --input: 180 20% 88%;
+    --ring: 174 72% 40%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 174 72% 40%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 174 72% 40%;
+    --sidebar-accent: 174 72% 45%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 174 60% 50%;
+    --sidebar-ring: 0 0% 100%;
+
+    /* Custom medical colors */
+    --medical-teal: 174 72% 40%;
+    --medical-teal-light: 174 60% 95%;
+    --medical-pink: 330 85% 60%;
+    --medical-blue: 210 90% 55%;
+    --medical-orange: 25 95% 55%;
+    --medical-green: 145 63% 45%;
+
+    /* Status colors */
+    --status-very-uncomfortable: 0 85% 55%;
+    --status-uncomfortable: 330 85% 60%;
+    --status-neutral: 200 15% 60%;
+    --status-comfortable: 145 63% 45%;
+    --status-very-comfortable: 174 72% 40%;
+
+    /* Gradients */
+    --gradient-sidebar: linear-gradient(180deg, hsl(174 72% 45%) 0%, hsl(174 72% 35%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(174 72% 40%) 0%, hsl(174 60% 50%) 100%);
+  }
+
+  .dark {
+    --background: 200 25% 10%;
+    --foreground: 0 0% 95%;
+
+    --card: 200 25% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 200 25% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 174 72% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 174 30% 20%;
+    --secondary-foreground: 174 60% 80%;
+
+    --muted: 200 20% 18%;
+    --muted-foreground: 200 15% 65%;
+
+    --accent: 330 85% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 20% 22%;
+    --input: 200 20% 22%;
+    --ring: 174 72% 50%;
+
+    --sidebar-background: 174 50% 20%;
+    --sidebar-foreground: 0 0% 95%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', 'Kanit', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', 'Kanit', sans-serif;
+  }
+}
+
+@layer components {
+  .medical-card {
+    @apply bg-card rounded-xl shadow-sm border p-6;
+    border-color: hsl(var(--border) / 0.5);
+  }
+
+  .stat-card {
+    @apply rounded-xl p-4 text-white shadow-md;
+  }
+
+  .stat-card-teal {
+    background: linear-gradient(135deg, hsl(174 72% 45%) 0%, hsl(174 72% 35%) 100%);
+  }
+
+  .stat-card-pink {
+    background: linear-gradient(135deg, hsl(330 85% 55%) 0%, hsl(330 85% 45%) 100%);
+  }
+
+  .sidebar-gradient {
+    background: linear-gradient(180deg, hsl(174 72% 45%) 0%, hsl(174 72% 35%) 100%);
+  }
+
+  .hero-gradient {
+    background: linear-gradient(135deg, hsl(174 72% 40%) 0%, hsl(174 60% 50%) 100%);
+  }
+
+  .status-badge {
+    @apply px-3 py-1 rounded-full text-xs font-medium;
+  }
+
+  .status-very-uncomfortable {
+    @apply bg-red-500 text-white;
+  }
+
+  .status-uncomfortable {
+    @apply bg-pink-500 text-white;
+  }
+
+  .status-neutral {
+    @apply bg-gray-400 text-white;
+  }
+
+  .status-comfortable {
+    @apply bg-green-500 text-white;
+  }
+
+  .status-very-comfortable {
+    @apply bg-teal-500 text-white;
+  }
+
+  .gender-male {
+    @apply bg-blue-500 text-white px-2 py-0.5 rounded text-xs;
+  }
+
+  .gender-female {
+    @apply bg-pink-500 text-white px-2 py-0.5 rounded text-xs;
+  }
+}
+
+@layer utilities {
+  .text-gradient-teal {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(174 72% 40%) 0%, hsl(174 60% 50%) 100%);
+  }
+}
