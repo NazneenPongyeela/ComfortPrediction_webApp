@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from auth import verify_token
 from schemas_ import PredictionInput, PatientCreate, PatientUpdate
 from preprocess.pipeline import preprocess_features
-from model_loader import predict
+from model_loader import predict, format_prediction
 from firebase import (
     save_result,
     get_patients,
@@ -31,19 +31,22 @@ def predict_signal(
 
     processed = preprocess_features(raw_data)
 
-    prediction = int(predict(processed))  # 🔥 แปลงเป็น int
+    prediction_value = int(predict(processed))  # 🔥 แปลงเป็น int
+    prediction_label = format_prediction(prediction_value)
 
     save_result(
         hospital_number=raw_data["hospital_number"],
         raw_data=raw_data,
         processed_features=processed,
-        prediction=prediction,
+        prediction=prediction_value,
+        prediction_label=prediction_label,
         user_uid=user["uid"]
     )
 
     return {
         "hospital_number": raw_data["hospital_number"],
-        "prediction": prediction,
+        "prediction": prediction_label,
+        "prediction_value": prediction_value,
         "processed_features": processed,
         "user": user
     }

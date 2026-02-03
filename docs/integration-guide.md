@@ -44,6 +44,15 @@ Recommended flow (if using Firebase Auth):
 
 > If you do not have `verify_token` yet, implement it using `firebase_admin.auth.verify_id_token` to match Firebase Auth usage on the frontend.
 
+### หมายเหตุสำคัญเรื่อง Firebase (Frontend vs Backend)
+- **Frontend (React/Vite)** ต้องใช้ Firebase Web SDK แบบ modular (`firebase/app`, `firebase/auth`) เท่านั้น
+  เพื่อให้ได้ `initializeApp`, `getAuth`, `signInWithEmailAndPassword`, `signOut` สำหรับฝั่งเบราว์เซอร์
+- **Backend (FastAPI)** ใช้ `firebase_admin` และไฟล์ `Backend/app/firebase_init.py` สำหรับฝั่งเซิร์ฟเวอร์
+  ซึ่งเป็นคนละ SDK และไม่สามารถ import มาใช้ใน frontend ได้
+
+ถ้าเจอ error ลักษณะ `Failed to resolve import "firebase/auth"` แปลว่าเครื่องยังไม่ได้ติดตั้งแพ็กเกจ
+`firebase` ในโฟลเดอร์ `Frontend` ให้รัน `npm install` ก่อน
+
 ## 4) Connect the Prediction page to the real backend
 The current `PredictionPage` is mocked. Replace the submit handler with a real API call:
 

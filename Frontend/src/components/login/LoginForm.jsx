@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
 import { signInUser } from "@/lib/firebase";
+import { setAuthToken } from "@/lib/apiClient";
 
 const LoginForm = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("admin@hospital.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -25,8 +26,18 @@ const LoginForm = () => {
 
     try {
       const credential = await signInUser(email, password);
-      const token = await credential.user.getIdToken();
-      localStorage.setItem("idToken", token);
+      const token = await credential?.user?.getIdToken?.();
+      if (!token) {
+        throw new Error("Unable to retrieve authentication token.");
+      }
+      if (rememberMe) {
+        localStorage.setItem("idToken", token);
+        sessionStorage.removeItem("idToken");
+      } else {
+        sessionStorage.setItem("idToken", token);
+        localStorage.removeItem("idToken");
+      }
+      setAuthToken(token);
       navigate("/patients");
     } catch (error) {
       setErrorMessage(

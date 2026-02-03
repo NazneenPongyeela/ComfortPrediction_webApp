@@ -8,6 +8,7 @@ def save_result(
     raw_data: dict,
     processed_features: dict,
     prediction: int,
+    prediction_label: str | None = None,
     user_uid: str | None = None
 ):
     path = f"/Predictions/{hospital_number}"
@@ -21,6 +22,8 @@ def save_result(
         "prediction": prediction,
     }
 
+    if prediction_label is not None:
+        result["prediction_label"] = prediction_label
     if user_uid:
         result["user_uid"] = user_uid
 

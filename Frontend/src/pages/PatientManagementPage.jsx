@@ -38,7 +38,7 @@ const PatientManagementPage = () => {
         heightCm: patient.height_cm ?? "",
         weightKg: patient.weight_kg ?? "",
         room: patient.room ?? "",
-        status: patient.status ?? "Neutral",
+        status: patient.status ?? "",
       }));
       setPatients(normalized);
     } catch (error) {
@@ -57,18 +57,47 @@ const PatientManagementPage = () => {
   }, []);
 
   const handleAddPatient = async (payload) => {
-    await createPatient(payload);
-    await loadPatients();
+    try {
+      setErrorMessage("");
+      await createPatient(payload);
+      await loadPatients();
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to add patient.";
+      setErrorMessage(message);
+      throw new Error(message);
+    }
   };
 
   const handleEditPatient = async (patientId, payload) => {
-    await updatePatient(patientId, payload);
-    await loadPatients();
+    try {
+      setErrorMessage("");
+      await updatePatient(patientId, payload);
+      await loadPatients();
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to update patient.";
+      setErrorMessage(message);
+      throw new Error(message);
+    }
   };
 
   const handleDeletePatient = async (patientId) => {
-    await deletePatient(patientId);
-    await loadPatients();
+    try {
+      setErrorMessage("");
+      await deletePatient(patientId);
+      await loadPatients();
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete patient."
+      );
+    }
   };
 
   const maleCount = useMemo(

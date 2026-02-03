@@ -1,3 +1,10 @@
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  signOut,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -7,63 +14,42 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+let cachedApp = null;
 let cachedAuth = null;
-let cachedSignOut = null;
-let cachedSignIn = null;
 
-const loadFirebaseAuth = async () => {
-  if (cachedAuth && cachedSignOut && cachedSignIn) {
-    return {
-      auth: cachedAuth,
-      signOut: cachedSignOut,
-      signInWithEmailAndPassword: cachedSignIn,
-    };
+const getFirebaseApp = () => {
+  if (cachedApp) {
+    return cachedApp;
   }
 
-  const firebaseAppPath = "firebase/" + "app";
-  const firebaseAuthPath = "firebase/" + "auth";
-  const dynamicImport = new Function("path", "return import(path);");
-  const appModule = await dynamicImport(firebaseAppPath).catch(() => null);
-  const authModule = await dynamicImport(firebaseAuthPath).catch(() => null);
+  cachedApp = initializeApp(firebaseConfig);
+  return cachedApp;
+};
 
-  if (!appModule || !authModule) {
-    return null;
+const getFirebaseAuth = () => {
+  if (cachedAuth) {
+    return cachedAuth;
   }
 
-  const app = appModule.initializeApp(firebaseConfig);
-  cachedAuth = authModule.getAuth(app);
-  cachedSignOut = authModule.signOut;
-  cachedSignIn = authModule.signInWithEmailAndPassword;
-
-  return {
-    auth: cachedAuth,
-    signOut: cachedSignOut,
-    signInWithEmailAndPassword: cachedSignIn,
-  };
+  const app = getFirebaseApp();
+  cachedAuth = getAuth(app);
+  return cachedAuth;
 };
 
 export const signOutUser = async () => {
-  const firebase = await loadFirebaseAuth();
-
-  if (!firebase) {
-    return;
-  }
-
-  await firebase.signOut(firebase.auth);
+  const firebaseAuth = getFirebaseAuth();
+  await signOut(firebaseAuth);
+  localStorage.removeItem("idToken");
+  sessionStorage.removeItem("idToken");
 };
 
 export const signInUser = async (email, password) => {
-  const firebase = await loadFirebaseAuth();
-
-  if (!firebase?.signInWithEmailAndPassword) {
-    throw new Error("Firebase authentication is unavailable.");
-  }
-
-  return firebase.signInWithEmailAndPassword(firebase.auth, email, password);
+  const firebaseAuth = getFirebaseAuth();
+  return signInWithEmailAndPassword(firebaseAuth, email, password);
 };
 
 export const auth = {
   get current() {
-    return cachedAuth;
+    return getFirebaseAuth();
   },
 };

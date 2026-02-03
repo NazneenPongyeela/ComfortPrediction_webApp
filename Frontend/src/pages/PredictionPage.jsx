@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Sparkles, ClipboardList } from "lucide-react";
 import { useState } from "react";
+import { predictComfort } from "@/lib/api";
 
 const PredictionPage = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,18 @@ const PredictionPage = () => {
   });
 
   const [prediction, setPrediction] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const normalizePrediction = (value) => {
+    if (typeof value === "number") {
+      return value === 1 ? "Comfortable" : "Uncomfortable";
+    }
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+    return null;
+  };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -41,11 +54,10 @@ const PredictionPage = () => {
   };
 
   const handlePredict = async () => {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const token =
-        localStorage.getItem("idToken") ||
-        sessionStorage.getItem("idToken");
+    setErrorMessage("");
+    setIsSubmitting(true);
 
+    try {
       const payload = {
         hospital_number: formData.hn,
         skintemp: parseFloat(formData.skinTemp) || 0,
@@ -58,18 +70,18 @@ const PredictionPage = () => {
         is_allergy: formData.allergic === "yes" ? 1 : 0,
       };
 
-      const response = await fetch(`${baseUrl}/predict`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-      setPrediction(result.prediction);
-    };
+      const result = await predictComfort(payload);
+      setPrediction(normalizePrediction(result.prediction));
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to fetch prediction."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -222,8 +234,18 @@ const PredictionPage = () => {
             </div>
           </div>
 
-          <Button onClick={handlePredict} className="w-full mt-6" size="lg">
-            Predict Comfort Level
+          {errorMessage ? (
+            <p className="text-sm text-destructive mt-4">
+              {errorMessage}
+            </p>
+          ) : null}
+          <Button
+            onClick={handlePredict}
+            className="w-full mt-6"
+            size="lg"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Predicting..." : "Predict Comfort Level"}
           </Button>
         </div>
 
