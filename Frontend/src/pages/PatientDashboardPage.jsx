@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import AlertBanner from "@/components/dashboard/AlertBanner";
 import PatientInfo from "@/components/dashboard/PatientInfo";
-import CurrentStatus from "@/components/dashboard/CurrentStatusPieChart";
+import CurrentStatusPieChart  from "@/components/dashboard/CurrentStatusPieChart";
 import MeasurementCards from "@/components/dashboard/MeasurementCards";
 import PredictionHistory from "@/components/dashboard/PredictionHistory";
 import { useEffect, useState } from "react";
