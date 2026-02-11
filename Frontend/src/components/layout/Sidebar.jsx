@@ -43,15 +43,15 @@ const Sidebar = ({ onLogout }) => {
         }`}
       >
         <div className="w-12 h-12 bg-sidebar-primary/20 rounded-xl flex items-center justify-center flex-shrink-0">
-          <Activity className="w-7 h-7 text-sidebar-foreground" />
+          <Activity className="w-7 h-7 text-white" />
         </div>
 
         {!isCollapsed && (
           <div>
-            <h1 className="font-semibold text-sidebar-foreground text-lg">
+            <h1 className="font-semibold text-white text-lg">
               Preventive Medicine
             </h1>
-            <p className="text-sidebar-foreground/70 text-sm">
+            <p className="text-white/80 text-sm">
               Thermal Comfort Monitoring
             </p>
           </div>
@@ -61,7 +61,7 @@ const Sidebar = ({ onLogout }) => {
       {/* Menu */}
       <nav className="flex-1 px-4 py-6">
         {!isCollapsed && (
-          <p className="text-sidebar-foreground/60 text-xs uppercase tracking-wider mb-4 px-3">
+          <p className="text-white/70 text-xs uppercase tracking-wider mb-4 px-3">
             Menu
           </p>
         )}
@@ -77,8 +77,8 @@ const Sidebar = ({ onLogout }) => {
                     isCollapsed ? "justify-center" : ""
                   } ${
                     isActive
-                      ? "bg-sidebar-primary/20 text-sidebar-foreground"
-                      : "text-sidebar-foreground/70 hover:bg-sidebar-primary/10 hover:text-sidebar-foreground"
+                      ? "bg-sidebar-primary/20 text-white"
+                      : "text-white/80 hover:bg-sidebar-primary/10 hover:text-white"
                   }`}
                   title={isCollapsed ? item.label : undefined}
                 >
@@ -97,8 +97,8 @@ const Sidebar = ({ onLogout }) => {
       <div className="p-4">
         <button
           onClick={onLogout}
-          className={`flex items-center gap-3 px-4 py-3 text-sidebar-foreground/70 hover:text-sidebar-foreground transition-colors w-full ${
-            isCollapsed ? "justify-center" : ""
+          className={`flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white transition-colors w-full ${
+              isCollapsed ? "justify-center" : ""
           }`}
           title={isCollapsed ? "Log out" : undefined}
         >
