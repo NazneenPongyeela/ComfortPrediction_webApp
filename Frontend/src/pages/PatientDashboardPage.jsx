@@ -1,10 +1,10 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import AlertBanner from "@/components/dashboard/AlertBanner";
 import PatientInfo from "@/components/dashboard/PatientInfo";
-import CurrentStatus from "@/components/dashboard/CurrentStatus";
+import CurrentStatus from "@/components/dashboard/CurrentStatusPieChart";
 import MeasurementCards from "@/components/dashboard/MeasurementCards";
 import PredictionHistory from "@/components/dashboard/PredictionHistory";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchPatient, fetchPredictionHistory } from "@/lib/api";
 
@@ -18,8 +18,8 @@ const formatGenderLabel = (value) => {
 
 const normalizePredictionLabel = (predictionLabel, predictionValue) => {
   if (predictionLabel) return predictionLabel;
-  if (predictionValue === 0) return "Uncomfortable";
-  if (predictionValue === 1) return "Comfortable";
+  if (predictionValue === 0) return "Comfortable";
+  if (predictionValue === 1) return "Uncomfortable";
   return "Unknown";
 };
 
@@ -117,17 +117,6 @@ const PatientDashboardPage = () => {
   const latestPrediction = predictionHistory[0];
   const patientStatus = latestPrediction?.status || "Unknown";
   const measurementData = latestPrediction?.raw || {};
-  const updatedAt = useMemo(() => {
-    if (latestPrediction?.timestamp) {
-      const { date, time } = formatTimestamp(latestPrediction.timestamp);
-      return `${date} ${time}`;
-    }
-    if (patient?.statusUpdatedAt) {
-      const { date, time } = formatTimestamp(patient.statusUpdatedAt);
-      return `${date} ${time}`;
-    }
-    return "No recent updates";
-  }, [latestPrediction, patient]);
 
   const getAlertConfig = (status) => {
     if (status === "Comfortable" || status === "Very comfortable") {
@@ -183,16 +172,7 @@ const PatientDashboardPage = () => {
               height={patient?.height || "-"}
               weight={patient?.weight || "-"}
             />
-            <CurrentStatus
-              status={patientStatus}
-              recommendation={
-                patientStatus === "Comfortable" ||
-                patientStatus === "Very comfortable"
-                  ? "Patient comfort level is optimal. Continue monitoring."
-                  : "Increase airflow or lower the temperature to improve comfort."
-              }
-              updatedAt={updatedAt}
-            />
+            <CurrentStatusPieChart records={predictionHistory} />
           </div>
 
           {/* Measurements */}
