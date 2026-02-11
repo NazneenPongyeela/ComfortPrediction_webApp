@@ -3,8 +3,9 @@ const getStatusEmoji = (status) => {
     case "Comfortable":
       return "😊";
     case "Uncomfortable":
-    default:
       return "😟";
+    default:
+      return "😐";
   }
 };
 
@@ -13,8 +14,9 @@ const getStatusClass = (status) => {
     case "Comfortable":
       return "bg-green-500";
     case "Uncomfortable":
+      return "bg-orange-500";
     default:
-      return "bg-red-500";
+      return "bg-gray-400";
   }
 };
 

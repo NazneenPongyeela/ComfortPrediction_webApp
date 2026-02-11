@@ -21,7 +21,7 @@ const getStatusEmoji = (status) => {
 const getStatusBadgeClass = (status) => {
   switch (status) {
     case "Uncomfortable":
-      return "bg-pink-500 text-white";
+      return "bg-orange-500 text-white";
     case "Comfortable":
     default:
       return "bg-green-500 text-white";
@@ -29,6 +29,22 @@ const getStatusBadgeClass = (status) => {
 };
 
 const PredictionHistory = ({ records }) => {
+  if (!records?.length) {
+    return (
+      <div className="medical-card">
+        <div className="flex items-center gap-2 mb-4">
+          <History className="w-5 h-5 text-primary" />
+          <h3 className="font-semibold text-foreground">
+            Prediction History
+          </h3>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          No prediction history available yet.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="medical-card">
       <div className="flex items-center gap-2 mb-4">
@@ -44,7 +60,7 @@ const PredictionHistory = ({ records }) => {
 
           return (
             <div
-              key={index}
+              key={record.id ?? `${record.date}-${record.time}-${index}`}
               className="flex items-center justify-between p-3 bg-background rounded-lg border border-border/50"
             >
               <div className="flex items-center gap-3">

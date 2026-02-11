@@ -1,19 +1,32 @@
-def normalize(value, min_val, max_val):
-    return (value - min_val) / (max_val - min_val)
+from __future__ import annotations
 
+import numpy as np
+import neurokit2 as nk
 
-def preprocess_eda(eda_raw: float) -> dict:
-    """
-    แปลง EDA raw → tonic / phasic (normalized 0-1)
-    """
+def extract_eda_features(
+    eda_signal: list[float],
+    sampling_rate: int,
+    min_samples: int | None = None,
+) -> dict:
+    if sampling_rate <= 0:
+        raise ValueError("eda_sampling_rate must be > 0")
 
-    # example range (คุณควรกำหนดจาก dataset จริง)
-    eda_norm = normalize(eda_raw, min_val=0, max_val=50)
+    if min_samples is None:
+        min_samples = max(30 * sampling_rate, 30)
 
-    eda_tonic = eda_norm * 0.7
-    eda_phasic = eda_norm * 0.3
+    if len(eda_signal) < min_samples:
+        raise ValueError(
+            "ต้องส่ง eda_signal และ rr_intervals_ms เป็น series ไม่ใช่ค่าเดียว"
+        )
+
+    eda_array = np.asarray(eda_signal, dtype=float)
+    eda_clean = nk.eda_clean(eda_array, sampling_rate=sampling_rate)
+    eda_decomp = nk.eda_phasic(eda_clean, sampling_rate=sampling_rate)
+
+    tonic = float(np.nanmean(eda_decomp["EDA_Tonic"]))
+    phasic = float(np.nanmean(eda_decomp["EDA_Phasic"]))
 
     return {
-        "eda_tonic": round(eda_tonic, 4),
-        "eda_phasic": round(eda_phasic, 4)
+        "EDA_Tonic_B": tonic,
+        "EDA_Phasic_B": phasic,
     }

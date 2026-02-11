@@ -12,12 +12,15 @@ const PredictionPage = () => {
     hn: "",
     bmi: "",
     skinTemp: "",
-    eda: "",
-    hrv: "",
     windSpeed: "",
     temperature: "",
     humidity: "",
-    allergic: "no",
+    edaTonic: "",
+    edaPhasic: "",
+    hfNEcg: "",
+    lfNEcg: "",
+    lfhfRatio: "",
+    allergic: "",
   });
 
   const [prediction, setPrediction] = useState(null);
@@ -29,6 +32,7 @@ const PredictionPage = () => {
       return value === 1 ? "Comfortable" : "Uncomfortable";
     }
     if (typeof value === "string" && value.trim()) {
+      if (value === "Comfort") return "Comfortable";
       return value;
     }
     return null;
@@ -48,8 +52,8 @@ const PredictionPage = () => {
     }
     return {
       emoji: "😟",
-      bgClass: "bg-pink-500",
-      textClass: "text-pink-600",
+      bgClass: "bg-orange-500",
+      textClass: "text-orange-600",
     };
   };
 
@@ -58,20 +62,34 @@ const PredictionPage = () => {
     setIsSubmitting(true);
 
     try {
+      const skinTemp = parseFloat(formData.skinTemp) || 0;
+      const bmi = parseFloat(formData.bmi) || 0;
+      const windSpeed = parseFloat(formData.windSpeed) || 0;
+      const temperature = parseFloat(formData.temperature) || 0;
+      const humidity = parseFloat(formData.humidity) || 0;
+      const edaTonic = parseFloat(formData.edaTonic) || 0;
+      const edaPhasic = parseFloat(formData.edaPhasic) || 0;
+      const hfNEcg = parseFloat(formData.hfNEcg) || 0;
+      const lfNEcg = parseFloat(formData.lfNEcg) || 0;
+      const lfhfRatio = parseFloat(formData.lfhfRatio) || 0;
+
       const payload = {
         hospital_number: formData.hn,
-        skintemp: parseFloat(formData.skinTemp) || 0,
-        bmi: parseFloat(formData.bmi) || 0,
-        eda_raw: parseFloat(formData.eda) || 0,
-        hrv_raw: parseFloat(formData.hrv) || 0,
-        windSpeed: parseFloat(formData.windSpeed) || 0,
-        temperature: parseFloat(formData.temperature) || 0,
-        humidity: parseFloat(formData.humidity) || 0,
+        skintemp: skinTemp,
+        bmi,
+        eda_tonic_b: edaTonic,
+        eda_phasic_b: edaPhasic,
+        hf_n_ecg_b: hfNEcg,
+        lf_n_ecg_b: lfNEcg,
+        lfhf_ratio_ecg_b: lfhfRatio,
+        windSpeed,
+        temperature,
+        humidity,
         is_allergy: formData.allergic === "yes" ? 1 : 0,
       };
 
       const result = await predictComfort(payload);
-      setPrediction(normalizePrediction(result.prediction));
+      setPrediction(normalizePrediction(result.label ?? result.prediction));
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -142,30 +160,6 @@ const PredictionPage = () => {
             </div>
 
             <div>
-              <Label htmlFor="hrv" className="text-sm text-muted-foreground mb-1.5 block">
-                HRV (ms)
-              </Label>
-              <Input
-                id="hrv"
-                placeholder="e.g., 45.5"
-                value={formData.hrv}
-                onChange={(e) => handleInputChange("hrv", e.target.value)}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="eda" className="text-sm text-muted-foreground mb-1.5 block">
-                EDA (μS)
-              </Label>
-              <Input
-                id="eda"
-                placeholder="e.g., 0.70"
-                value={formData.eda}
-                onChange={(e) => handleInputChange("eda", e.target.value)}
-              />
-            </div>
-
-            <div>
               <Label htmlFor="windSpeed" className="text-sm text-muted-foreground mb-1.5 block">
                 Wind Speed (m/s)
               </Label>
@@ -203,6 +197,76 @@ const PredictionPage = () => {
                 value={formData.humidity}
                 onChange={(e) =>
                   handleInputChange("humidity", e.target.value)
+                }
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edaTonic" className="text-sm text-muted-foreground mb-1.5 block">
+                EDA Tonic (EDA_Tonic_B)
+              </Label>
+              <Input
+                id="edaTonic"
+                placeholder="e.g., 0.15"
+                value={formData.edaTonic}
+                onChange={(e) =>
+                  handleInputChange("edaTonic", e.target.value)
+                }
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edaPhasic" className="text-sm text-muted-foreground mb-1.5 block">
+                EDA Phasic (EDA_Phasic_B)
+              </Label>
+              <Input
+                id="edaPhasic"
+                placeholder="e.g., 0.03"
+                value={formData.edaPhasic}
+                onChange={(e) =>
+                  handleInputChange("edaPhasic", e.target.value)
+                }
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="hfNEcg" className="text-sm text-muted-foreground mb-1.5 block">
+                HF_n_ECG_B
+              </Label>
+              <Input
+                id="hfNEcg"
+                placeholder="e.g., 0.22"
+                value={formData.hfNEcg}
+                onChange={(e) =>
+                  handleInputChange("hfNEcg", e.target.value)
+                }
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="lfNEcg" className="text-sm text-muted-foreground mb-1.5 block">
+                LF_n_ECG_B
+              </Label>
+              <Input
+                id="lfNEcg"
+                placeholder="e.g., 0.18"
+                value={formData.lfNEcg}
+                onChange={(e) =>
+                  handleInputChange("lfNEcg", e.target.value)
+                }
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="lfhfRatio" className="text-sm text-muted-foreground mb-1.5 block">
+                LFHF_ratio_ECG_B
+              </Label>
+              <Input
+                id="lfhfRatio"
+                placeholder="e.g., 1.2"
+                value={formData.lfhfRatio}
+                onChange={(e) =>
+                  handleInputChange("lfhfRatio", e.target.value)
                 }
               />
             </div>

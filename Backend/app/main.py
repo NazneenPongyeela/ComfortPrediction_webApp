@@ -1,14 +1,14 @@
 from fastapi import FastAPI, Depends
 from auth import verify_token
-from schemas_ import PredictionInput, PatientCreate, PatientUpdate
-from preprocess.pipeline import preprocess_features
-from model_loader import predict, format_prediction
+from api.routes.predict import router as predict_router
+from schemas_ import PatientCreate, PatientUpdate
 from firebase import (
-    save_result,
     get_patients,
+    get_patient,
+    get_prediction_history,
     add_patient,
     update_patient,
-    delete_patient
+    delete_patient,
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,39 +22,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/predict")
-def predict_signal(
-    data: PredictionInput,
-    user=Depends(verify_token)
-):
-    raw_data = data.dict()
-
-    processed = preprocess_features(raw_data)
-
-    prediction_value = int(predict(processed))  # 🔥 แปลงเป็น int
-    prediction_label = format_prediction(prediction_value)
-
-    save_result(
-        hospital_number=raw_data["hospital_number"],
-        raw_data=raw_data,
-        processed_features=processed,
-        prediction=prediction_value,
-        prediction_label=prediction_label,
-        user_uid=user["uid"]
-    )
-
-    return {
-        "hospital_number": raw_data["hospital_number"],
-        "prediction": prediction_label,
-        "prediction_value": prediction_value,
-        "processed_features": processed,
-        "user": user
-    }
+app.include_router(predict_router)
 
 
 @app.get("/patients")
 def list_patients(user=Depends(verify_token)):
     return get_patients(user["uid"])
+
+@app.get("/patients/{patient_id}")
+def read_patient(patient_id: str, user=Depends(verify_token)):
+    return get_patient(user["uid"], patient_id)
 
 
 @app.post("/patients")
@@ -74,3 +51,7 @@ def edit_patient(patient_id: str, patient: PatientUpdate, user=Depends(verify_to
 def remove_patient(patient_id: str, user=Depends(verify_token)):
     delete_patient(user["uid"], patient_id)
     return {"status": "deleted"}
+
+@app.get("/predictions/{hospital_number}")
+def list_predictions(hospital_number: str, user=Depends(verify_token)):
+    return get_prediction_history(hospital_number, user["uid"])

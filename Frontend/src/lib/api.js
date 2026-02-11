@@ -75,6 +75,12 @@ const requestJson = async (path, options = {}) => {
 
 export const fetchPatients = () => requestJson("/patients", { method: "GET" });
 
+export const fetchPatient = (patientId) =>
+  requestJson(`/patients/${patientId}`, { method: "GET" });
+
+export const fetchPredictionHistory = (hospitalNumber) =>
+  requestJson(`/predictions/${hospitalNumber}`, { method: "GET" });
+
 export const createPatient = (payload) =>
   requestJson("/patients", {
     method: "POST",

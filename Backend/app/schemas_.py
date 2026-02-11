@@ -1,18 +1,21 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Literal
+from typing import Optional, Literal, Union
 
 class PredictionInput(BaseModel):
     hospital_number: str
-    skintemp: float
-    bmi: float
-    eda_raw: float          # raw EDA
-    hrv_raw: float          # raw HRV
     windSpeed: float
     temperature: float
     humidity: float
-    is_allergy: int
+    is_allergy: Union[bool, int]
+    skintemp: float
+    bmi: float
+    eda_tonic_b: float
+    eda_phasic_b: float
+    hf_n_ecg_b: float
+    lf_n_ecg_b: float
+    lfhf_ratio_ecg_b: float
 
-Gender = Literal["male", "female", "other"]
+Gender = Literal["male", "female"]
 
 class PatientBase(BaseModel):
     hospital_number: str = Field(..., min_length=1, max_length=50)

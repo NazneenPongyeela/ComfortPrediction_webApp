@@ -61,7 +61,7 @@ const MeasurementCards = ({ windSpeed, skinTemp, tonic, lfhf }) => {
             </p>
 
             <p className={`text-2xl font-bold ${measurement.color}`}>
-              {measurement.value}
+              {measurement.value ?? "-"}
             </p>
           </div>
         ))}
