@@ -1,8 +1,8 @@
 import { auth } from "@/lib/firebase";
 
 const resolveApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl && envUrl.trim()) return envUrl.trim();
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  if (envUrl && envUrl.trim()) return envUrl.trim().replace(/\/$/, "");
   return "http://localhost:8000";
 };
 
