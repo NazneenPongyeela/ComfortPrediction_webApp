@@ -11,7 +11,7 @@ from ...schemas_ import PredictionInput
 
 router = APIRouter()
 
-MODEL_PATH = Path(__file__).resolve().parents[3] / "model" / "rf_model.pkl"␊
+MODEL_PATH = Path(__file__).resolve().parents[3] / "model" / "rf_model.pkl"
 _FEATURES = [
     "windSpeed",
     "temperature",
@@ -69,8 +69,23 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
     row["is_allergy"] = int(bool(row["is_allergy"]))
     features = pd.DataFrame([[row[name] for name in _FEATURES]], columns=_FEATURES)
 
-    prediction = int(model.predict(features)[0])
-    label = "Comfort" if prediction == 0 else "Discomfort"
+    raw_prediction = model.predict(features)[0]
+    if isinstance(raw_prediction, str):
+        normalized = raw_prediction.strip().lower()
+        if normalized in {"comfort", "0"}:
+            prediction = 0
+            label = "Comfort"
+        elif normalized in {"discomfort", "1"}:
+            prediction = 1
+            label = "Discomfort"
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Unexpected model output: {raw_prediction!r}",
+            )
+    else:
+        prediction = int(raw_prediction)
+        label = "Comfort" if prediction == 0 else "Discomfort"
 
     prediction_id = save_result(
         hospital_number=data.hospital_number,
@@ -86,4 +101,3 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
         "prediction": prediction,
         "label": label,
     }
-
