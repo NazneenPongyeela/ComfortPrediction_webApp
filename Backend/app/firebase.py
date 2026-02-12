@@ -1,7 +1,7 @@
 from firebase_admin import db, exceptions as firebase_exceptions
 from datetime import datetime
 import uuid
-import firebase_init
+from app import firebase_init
 
 def save_result(
     hospital_number: str,
