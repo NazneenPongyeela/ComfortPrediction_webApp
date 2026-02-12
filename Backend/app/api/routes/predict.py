@@ -1,5 +1,6 @@
 from pathlib import Path
 import pickle
+from typing import Any
 
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
@@ -28,9 +29,26 @@ _FEATURES = [
 
 MODEL_LOAD_ERROR = None
 
+
+def _load_model(model_path: Path) -> Any:
+    model_bytes = model_path.read_bytes()
+
+    if model_bytes.startswith(b"version https://git-lfs.github.com/spec/v1"):
+        raise RuntimeError(
+            "Model file is a Git LFS pointer, not the actual binary model. "
+            "Pull LFS objects before starting the API."
+        )
+
+    try:
+        return pickle.loads(model_bytes)
+    except pickle.UnpicklingError as exc:
+        if model_bytes[:1] in (b"\n", b"\r", b"\t", b" "):
+            return pickle.loads(model_bytes.lstrip())
+        raise exc
+
+
 try:
-    with MODEL_PATH.open("rb") as model_file:
-        model = pickle.load(model_file)
+    model = _load_model(MODEL_PATH)
 except Exception as exc:
     model = None
     MODEL_LOAD_ERROR = str(exc)
@@ -43,7 +61,7 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
         if MODEL_LOAD_ERROR:
             detail = (
                 f"{detail}. Failed to load model from {MODEL_PATH.name}: {MODEL_LOAD_ERROR}. "
-                "Ensure scikit-learn version matches the training environment (expected 1.7.2)."
+                "Ensure scikit-learn version matches the training environment."
             )
         raise HTTPException(status_code=500, detail=detail)
 
