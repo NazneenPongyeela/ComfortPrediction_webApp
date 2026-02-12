@@ -26,17 +26,26 @@ _FEATURES = [
 ]
 
 
+MODEL_LOAD_ERROR = None
+
 try:
     with MODEL_PATH.open("rb") as model_file:
         model = pickle.load(model_file)
-except Exception:
+except Exception as exc:
     model = None
+    MODEL_LOAD_ERROR = str(exc)
 
 
 @router.post("/predict")
 def predict(data: PredictionInput, user=Depends(verify_token)):
     if model is None:
-        raise HTTPException(status_code=500, detail="Prediction model is not available")
+        detail = "Prediction model is not available"
+        if MODEL_LOAD_ERROR:
+            detail = (
+                f"{detail}. Failed to load model from {MODEL_PATH.name}: {MODEL_LOAD_ERROR}. "
+                "Ensure scikit-learn version matches the training environment (expected 1.7.2)."
+            )
+        raise HTTPException(status_code=500, detail=detail)
 
     row = data.model_dump()
     row["is_allergy"] = int(bool(row["is_allergy"]))
