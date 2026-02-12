@@ -5,9 +5,9 @@ from typing import Any
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
 
-from auth import verify_token
-from firebase import save_result
-from schemas_ import PredictionInput
+from app.auth import verify_token
+from app.firebase import save_result
+from app.schemas_ import PredictionInput
 
 router = APIRouter()
 
@@ -86,3 +86,4 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
         "prediction": prediction,
         "label": label,
     }
+
