@@ -1,8 +1,11 @@
+import os
 from fastapi import FastAPI, Depends
-from auth import verify_token
-from api.routes.predict import router as predict_router
-from schemas_ import PatientCreate, PatientUpdate
-from firebase import (
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.auth import verify_token
+from app.api.routes.predict import router as predict_router
+from app.schemas_ import PatientCreate, PatientUpdate
+from app.firebase import (
     get_patients,
     get_patient,
     get_prediction_history,
@@ -10,13 +13,17 @@ from firebase import (
     update_patient,
     delete_patient,
 )
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+allowed_origins = ["http://localhost:5173"]
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    allowed_origins.append(frontend_url.rstrip("/"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
