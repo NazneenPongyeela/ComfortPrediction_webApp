@@ -29,7 +29,7 @@ const PredictionPage = () => {
 
   const normalizePrediction = (value) => {
     if (typeof value === "number") {
-      return value === 0 ? "Comfortable" : "Uncomfortable";
+      return value === 1 ? "Comfortable" : "Uncomfortable";
     }
     if (typeof value === "string" && value.trim()) {
       if (value === "Comfort") return "Comfortable";
