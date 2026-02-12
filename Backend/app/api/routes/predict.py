@@ -73,10 +73,10 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
     if isinstance(raw_prediction, str):
         normalized = raw_prediction.strip().lower()
         if normalized in {"comfort", "0"}:
-            prediction = 0
+            prediction = 1
             label = "Comfort"
         elif normalized in {"discomfort", "1"}:
-            prediction = 1
+            prediction = 0
             label = "Discomfort"
         else:
             raise HTTPException(
@@ -85,7 +85,7 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
             )
     else:
         prediction = int(raw_prediction)
-        label = "Comfort" if prediction == 0 else "Discomfort"
+        label = "Comfort" if prediction == 1 else "Discomfort"
 
     prediction_id = save_result(
         hospital_number=data.hospital_number,
