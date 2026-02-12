@@ -1,6 +1,6 @@
 from fastapi import Header, HTTPException, status
 from firebase_admin import auth
-import firebase_init
+from app import firebase_init
 
 def verify_token(authorization: str | None = Header(default=None)):
     if not authorization:
