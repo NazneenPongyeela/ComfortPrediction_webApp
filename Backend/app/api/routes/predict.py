@@ -11,7 +11,7 @@ from app.schemas_ import PredictionInput
 
 router = APIRouter()
 
-MODEL_PATH = Path(__file__).resolve().parents[3] / "model" / "rf_model.pkl"
+MODEL_PATH = Path(__file__).resolve().parents[3] / "model" / "rf_model.pkl"␊
 _FEATURES = [
     "windSpeed",
     "temperature",
@@ -86,4 +86,3 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
         "prediction": prediction,
         "label": label,
     }
-
