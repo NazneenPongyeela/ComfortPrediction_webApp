@@ -18,8 +18,8 @@ const formatGenderLabel = (value) => {
 
 const normalizePredictionLabel = (predictionLabel, predictionValue) => {
   if (predictionLabel) return predictionLabel;
-  if (predictionValue === 0) return "Comfortable";
-  if (predictionValue === 1) return "Uncomfortable";
+  if (predictionValue === 1) return "Comfortable";
+  if (predictionValue === 0) return "Uncomfortable";
   return "Unknown";
 };
 
