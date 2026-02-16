@@ -4,8 +4,12 @@ import { History } from "lucide-react";
  * Normalize status ให้เหลือแค่ 2 ค่า
  */
 const normalizeStatus = (status) => {
-  if (status === "Uncomfortable") return "Uncomfortable";
-  return "Comfortable"; // รวม Comfortable + Very comfortable
+  const normalized = String(status || "").trim().toLowerCase();
+  if (normalized === "uncomfortable" || normalized === "discomfort") {
+    return "Uncomfortable";
+  }
+  return "Comfortable";
+};
 };
 
 const getStatusEmoji = (status) => {
