@@ -29,14 +29,23 @@ const PredictionPage = () => {
 
   const normalizePrediction = (value) => {
     if (typeof value === "number") {
-      return value === 1 ? "Comfortable" : "Uncomfortable";
+      if (value === 1) return "Uncomfortable";
+      if (value === 0) return "Comfortable";
+      return null;
     }
     if (typeof value === "string" && value.trim()) {
-      if (value === "Comfort") return "Comfortable";
-      return value;
+      const normalizedValue = value.trim().toLowerCase();
+      if (normalizedValue === "1") return "Uncomfortable";
+      if (normalizedValue === "0") return "Comfortable";
+      if (normalizedValue === "comfort") return "Comfortable";
+      if (normalizedValue === "comfortable") return "Comfortable";
+      if (normalizedValue === "uncomfortable") return "Uncomfortable";
     }
     return null;
   };
+
+  const getPredictionBadgeLabel = (result) =>
+    result === "Uncomfortable" ? "1 Uncomfortable" : "0 Comfortable";
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -333,13 +342,13 @@ const PredictionPage = () => {
                     <span
                       className={`text-2xl font-bold ${getPredictionStyle(prediction).textClass}`}
                     >
-                      {prediction}
+                      {getPredictionBadgeLabel(prediction)}
                     </span>
                   </div>
                   <span
                     className={`inline-block px-4 py-2 rounded-full text-sm font-medium text-white ${getPredictionStyle(prediction).bgClass}`}
                   >
-                    {prediction}
+                    {getPredictionBadgeLabel(prediction)}
                   </span>
                 </>
               ) : (
