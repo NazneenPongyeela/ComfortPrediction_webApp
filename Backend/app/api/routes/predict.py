@@ -1,8 +1,10 @@
 from pathlib import Path
+from io import BytesIO
 import pickle
 from typing import Any
 
 import app
+import joblib
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -30,23 +32,26 @@ _FEATURES = [
 
 MODEL_LOAD_ERROR = None
 
-
 def _load_model(model_path: Path) -> Any:
     model_bytes = model_path.read_bytes()
+    normalized_bytes = model_bytes.lstrip()
 
-    if model_bytes.startswith(b"version https://git-lfs.github.com/spec/v1"):
+    if normalized_bytes.startswith(b"version https://git-lfs.github.com/spec/v1"):
         raise RuntimeError(
             "Model file is a Git LFS pointer, not the actual binary model. "
             "Pull LFS objects before starting the API."
         )
 
     try:
-        return pickle.loads(model_bytes)
-    except pickle.UnpicklingError as exc:
-        if model_bytes[:1] in (b"\n", b"\r", b"\t", b" "):
-            return pickle.loads(model_bytes.lstrip())
-        raise exc
-
+        return pickle.loads(normalized_bytes)
+    except Exception as pickle_exc:
+        try:
+            return joblib.load(BytesIO(normalized_bytes))
+        except Exception:
+            raise RuntimeError(
+                f"Unable to deserialize model file at {model_path}. "
+                "The file may be corrupted, plain text, or produced by an incompatible library version."
+            ) from pickle_exc
 
 try:
     model = _load_model(MODEL_PATH)
@@ -102,4 +107,3 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
         "prediction": prediction,
         "label": label,
     }
-
