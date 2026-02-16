@@ -2,16 +2,17 @@ from pathlib import Path
 import pickle
 from typing import Any
 
+import app
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
 
-from ...auth import verify_token
-from ...firebase import save_result
-from ...schemas_ import PredictionInput
+from app.auth import verify_token
+from app.firebase import save_result
+from app.schemas_ import PredictionInput
 
 router = APIRouter()
 
-MODEL_PATH = Path(__file__).resolve().parents[3] / "model" / "rf_model.pkl"
+MODEL_PATH = Path(app.__file__).resolve().parent.parent / "model" / "rf_model.pkl"
 _FEATURES = [
     "windSpeed",
     "temperature",
@@ -101,3 +102,4 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
         "prediction": prediction,
         "label": label,
     }
+
