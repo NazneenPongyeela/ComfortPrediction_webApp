@@ -78,12 +78,12 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
     raw_prediction = model.predict(features)[0]
     if isinstance(raw_prediction, str):
         normalized = raw_prediction.strip().lower()
-        if normalized in {"comfort", "0"}:
+        if normalized in {"comfortable", "comfort", "1"}:
             prediction = 1
-            label = "Comfort"
-        elif normalized in {"discomfort", "1"}:
+            label = "Comfortable"
+        elif normalized in {"uncomfortable", "discomfort", "0"}:
             prediction = 0
-            label = "Discomfort"
+            label = "Uncomfortable"
         else:
             raise HTTPException(
                 status_code=500,
@@ -91,7 +91,12 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
             )
     else:
         prediction = int(raw_prediction)
-        label = "Comfort" if prediction == 1 else "Discomfort"
+        if prediction not in {0, 1}:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Unexpected model output: {raw_prediction!r}",
+            )
+        label = "Comfortable" if prediction == 1 else "Uncomfortable"
 
     prediction_id = save_result(
         hospital_number=data.hospital_number,
@@ -107,3 +112,4 @@ def predict(data: PredictionInput, user=Depends(verify_token)):
         "prediction": prediction,
         "label": label,
     }
+
