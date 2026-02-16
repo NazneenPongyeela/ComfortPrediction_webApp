@@ -2,10 +2,10 @@ import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.auth import verify_token
-from app.api.routes.predict import router as predict_router
-from app.schemas_ import PatientCreate, PatientUpdate
-from app.firebase import (
+from auth import verify_token
+from api.routes.predict import router as predict_router
+from schemas_ import PatientCreate, PatientUpdate
+from firebase import (
     get_patients,
     get_patient,
     get_prediction_history,
