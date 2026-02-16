@@ -21,10 +21,13 @@ const formatGenderLabel = (value) => {
 const formatStatusLabel = (value) => {
   if (!value) return "";
 
-  const normalized = value.toLowerCase();
-  if (normalized === "discomfort") return "Uncomfortable";
-  if (normalized === "comfort") return "Comfortable";
-
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "uncomfortable" || normalized === "discomfort") {
+    return "Uncomfortable";
+  }
+  if (normalized === "comfortable" || normalized === "comfort") {
+    return "Comfortable";
+  }
   return value;
 };
 
