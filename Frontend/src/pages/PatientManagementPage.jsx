@@ -18,6 +18,16 @@ const formatGenderLabel = (value) => {
   return value;
 };
 
+const formatStatusLabel = (value) => {
+  if (!value) return "";
+
+  const normalized = value.toLowerCase();
+  if (normalized === "discomfort") return "Uncomfortable";
+  if (normalized === "comfort") return "Comfortable";
+
+  return value;
+};
+
 const PatientManagementPage = () => {
   const [patients, setPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +48,7 @@ const PatientManagementPage = () => {
         heightCm: patient.height_cm ?? "",
         weightKg: patient.weight_kg ?? "",
         room: patient.room ?? "",
-        status: patient.status ?? "",
+        status: formatStatusLabel(patient.status),
       }));
       setPatients(normalized);
     } catch (error) {
