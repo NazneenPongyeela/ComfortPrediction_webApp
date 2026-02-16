@@ -17,7 +17,15 @@ const formatGenderLabel = (value) => {
 };
 
 const normalizePredictionLabel = (predictionLabel, predictionValue) => {
-  if (predictionLabel) return predictionLabel;
+  if (predictionLabel) {
+    const normalized = predictionLabel.trim().toLowerCase();
+    if (normalized === "comfortable" || normalized === "comfort") {
+      return "Comfortable";
+    }
+    if (normalized === "uncomfortable" || normalized === "discomfort") {
+      return "Uncomfortable";
+    }
+  }
   if (predictionValue === 1) return "Comfortable";
   if (predictionValue === 0) return "Uncomfortable";
   return "Unknown";
@@ -119,7 +127,7 @@ const PatientDashboardPage = () => {
   const measurementData = latestPrediction?.raw || {};
 
   const getAlertConfig = (status) => {
-    if (status === "Comfortable" || status === "Very comfortable") {
+    if (status === "Comfortable") {
       return {
         type: "success",
         title: "Optimal Comfort",
