@@ -32,7 +32,13 @@ const PredictionPage = () => {
       return value === 1 ? "Comfortable" : "Uncomfortable";
     }
     if (typeof value === "string" && value.trim()) {
-      if (value === "Comfort") return "Comfortable";
+      const normalized = value.trim().toLowerCase();
+      if (normalized === "comfortable" || normalized === "comfort") {
+        return "Comfortable";
+      }
+      if (normalized === "uncomfortable" || normalized === "discomfort") {
+        return "Uncomfortable";
+      }
       return value;
     }
     return null;
