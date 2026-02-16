@@ -6,7 +6,10 @@ const COLORS = {
 };
 
 const normalizeStatus = (status) => {
-  if (status === "Uncomfortable") return "Uncomfortable";
+  const normalized = String(status || "").trim().toLowerCase();
+  if (normalized === "uncomfortable" || normalized === "discomfort") {
+    return "Uncomfortable";
+  }
   return "Comfortable";
 };
 
