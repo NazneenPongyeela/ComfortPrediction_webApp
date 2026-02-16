@@ -14,20 +14,9 @@ import { useNavigate } from "react-router-dom";
 import AddPatientDialog from "./AddPatientDialog";
 
 const getStatusClass = (status) => {
-  switch (status) {
-    case "Very Uncomfortable":
-      return "status-very-uncomfortable";
-    case "Uncomfortable":
-      return "status-uncomfortable";
-    case "Neutral":
-      return "status-neutral";
-    case "Comfortable":
-      return "status-comfortable";
-    case "Very comfortable":
-      return "status-very-comfortable";
-    default:
-      return "status-neutral";
-  }
+  if (status === "Uncomfortable") return "status-uncomfortable";
+  if (status === "Comfortable") return "status-comfortable";
+  return "status-neutral";
 };
 
 const PatientTable = ({
