@@ -6,6 +6,7 @@ import PatientTable from "@/components/patients/PatientTable";
 import {
   createPatient,
   deletePatient,
+  fetchPredictionHistory,
   fetchPatients,
   updatePatient,
 } from "@/lib/api";
@@ -28,7 +29,18 @@ const formatStatusLabel = (value) => {
   if (normalized === "comfortable" || normalized === "comfort") {
     return "Comfortable";
   }
+
   return value;
+};
+
+const resolveLatestPredictionStatus = (record) => {
+  if (!record) return "";
+  const label = formatStatusLabel(record.prediction_label ?? record.status);
+  if (label) return label;
+
+  if (record.prediction === 1) return "Comfortable";
+  if (record.prediction === 0) return "Uncomfortable";
+  return "";
 };
 
 const PatientManagementPage = () => {
@@ -53,7 +65,26 @@ const PatientManagementPage = () => {
         room: patient.room ?? "",
         status: formatStatusLabel(patient.status),
       }));
-      setPatients(normalized);
+
+      const patientsWithLatestStatus = await Promise.all(
+        normalized.map(async (patient) => {
+          const hn = String(patient.hn || "").trim();
+          if (!hn) return patient;
+
+          try {
+            const history = await fetchPredictionHistory(hn);
+            const latestStatus = resolveLatestPredictionStatus(history?.[0]);
+            return latestStatus
+              ? { ...patient, status: latestStatus }
+              : patient;
+          } catch {
+            return patient;
+          }
+        })
+      );
+
+      setPatients(patientsWithLatestStatus);
+      
     } catch (error) {
       setErrorMessage(
         error instanceof Error
