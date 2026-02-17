@@ -31,16 +31,21 @@ const normalizePredictionLabel = (predictionLabel, predictionValue) => {
   return "Unknown";
 };
 
+const THAILAND_TIMEZONE = "Asia/Bangkok";
+
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return { date: "-", time: "-" };
   const parsed = new Date(timestamp);
   if (Number.isNaN(parsed.getTime())) return { date: "-", time: "-" };
   return {
-    date: parsed.toLocaleDateString("en-GB"),
+    date: parsed.toLocaleDateString("en-GB", {
+      timeZone: THAILAND_TIMEZONE,
+    }),
     time: parsed.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
+      timeZone: THAILAND_TIMEZONE,
     }),
   };
 };
@@ -125,6 +130,18 @@ const PatientDashboardPage = () => {
   const latestPrediction = predictionHistory[0];
   const patientStatus = latestPrediction?.status || "Unknown";
   const measurementData = latestPrediction?.raw || {};
+  const latestMeasurements = {
+    windSpeed: measurementData.windSpeed ?? measurementData.wind_speed,
+    skinTemp: measurementData.skintemp ?? measurementData.skinTemp,
+    tonic:
+      measurementData.eda_tonic_b ??
+      measurementData.edaTonic ??
+      measurementData.eda_raw,
+    lfhf:
+      measurementData.lfhf_ratio_ecg_b ??
+      measurementData.lfhfRatio ??
+      measurementData.hrv_raw,
+  };
 
   const getAlertConfig = (status) => {
     if (status === "Comfortable") {
@@ -185,10 +202,10 @@ const PatientDashboardPage = () => {
 
           {/* Measurements */}
           <MeasurementCards
-            windSpeed={measurementData.windSpeed}
-            skinTemp={measurementData.skintemp}
-            tonic={measurementData.eda_raw}
-            lfhf={measurementData.hrv_raw}
+            windSpeed={latestMeasurements.windSpeed}
+            skinTemp={latestMeasurements.skinTemp}
+            tonic={latestMeasurements.tonic}
+            lfhf={latestMeasurements.lfhf}
           />
 
           {/* Prediction History */}
