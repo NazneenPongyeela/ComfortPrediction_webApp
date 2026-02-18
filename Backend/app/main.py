@@ -16,10 +16,25 @@ from .firebase import (
 
 app = FastAPI()
 
-allowed_origins = ["http://localhost:5173"]
-frontend_url = os.getenv("FRONTEND_URL")
-if frontend_url:
-    allowed_origins.append(frontend_url.rstrip("/"))
+def _parse_allowed_origins() -> list[str]:
+    origins = ["http://localhost:5173"]
+
+    frontend_url = os.getenv("FRONTEND_URL", "")
+    frontend_urls = os.getenv("FRONTEND_URLS", "")
+
+    configured = [frontend_url, frontend_urls]
+    for item in configured:
+        if not item:
+            continue
+        for origin in item.split(","):
+            normalized = origin.strip().rstrip("/")
+            if normalized and normalized not in origins:
+                origins.append(normalized)
+    return origins
+
+
+allowed_origins = _parse_allowed_origins()
+allowed_origin_regex = os.getenv("FRONTEND_ORIGIN_REGEX")
 
 app.add_middleware(
     CORSMiddleware,
