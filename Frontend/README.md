@@ -50,7 +50,7 @@ The system is designed for comfort prediction and patient data management.
 
 Please refer to the following document for backend–frontend integration, including login, prediction, patient management, and logout:
 
-- [docs/integration-guide.md](docs/integration-guide.md)
+- [docs/deployment-guide.md](docs/deployment-guide.md)
 
 
 ## Frontend Setup (แก้ปัญหา Firebase import หาไม่เจอ)
