@@ -10,7 +10,6 @@ const normalizeStatus = (status) => {
   }
   return "Comfortable";
 };
-};
 
 const getStatusEmoji = (status) => {
   switch (status) {
