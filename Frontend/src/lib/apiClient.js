@@ -1,5 +1,9 @@
 // src/lib/apiClient.js
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const resolveApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  if (envUrl && envUrl.trim()) return envUrl.trim().replace(/\/$/, "");
+  return "http://localhost:8000";
+};
 
 let inMemoryToken = null;
 
